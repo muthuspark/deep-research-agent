@@ -1,6 +1,7 @@
 import asyncio
 from typing import List, Dict, Any, Optional, NamedTuple
 from dataclasses import dataclass
+from datetime import datetime
 from .ai_providers import ai_provider
 from .prompts import get_system_prompt
 from .firecrawl_client import firecrawl
@@ -17,15 +18,24 @@ class SerpQuery(NamedTuple):
 async def generate_serp_queries(
     query: str, 
     num_queries: int = 3, 
-    learnings: Optional[List[str]] = None
+    learnings: Optional[List[str]] = None,
+    prioritize_recent: bool = True
 ) -> List[SerpQuery]:
-    """Generate SERP queries for research"""
+    """Generate SERP queries for research with optional recency focus"""
+    
+    # Get current year for date filtering
+    current_year = datetime.now().year
     
     learnings_text = ""
     if learnings:
         learnings_text = f"\n\nHere are some learnings from previous research, use them to generate more specific queries: {' '.join(learnings)}"
     
-    prompt = f"""Given the following prompt from the user, generate a list of SERP queries to research the topic. Return a maximum of {num_queries} queries, but feel free to return less if the original prompt is clear. Make sure each query is unique and not similar to each other: <prompt>{query}</prompt>{learnings_text}"""
+    # Add recency instruction if needed
+    recency_instruction = ""
+    if prioritize_recent:
+        recency_instruction = f"\n\nIMPORTANT: For each query, add relevant date terms to find the most recent information. Use terms like '{current_year}', 'latest', 'recent', 'current', 'updated', 'new' where appropriate. Focus on finding information from {current_year} and {current_year-1}."
+    
+    prompt = f"""Given the following prompt from the user, generate a list of SERP queries to research the topic. Return a maximum of {num_queries} queries, but feel free to return less if the original prompt is clear. Make sure each query is unique and not similar to each other: <prompt>{query}</prompt>{learnings_text}{recency_instruction}"""
     
     schema = {
         "queries": {
@@ -35,7 +45,7 @@ async def generate_serp_queries(
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "The SERP query"
+                        "description": "The SERP query with date terms for recent information"
                     },
                     "research_goal": {
                         "type": "string",
@@ -111,24 +121,26 @@ async def deep_research(
     breadth: int,
     depth: int,
     learnings: Optional[List[str]] = None,
-    visited_urls: Optional[List[str]] = None
+    visited_urls: Optional[List[str]] = None,
+    prioritize_recent: bool = True,
+    days_back: Optional[int] = None
 ) -> ResearchResult:
-    """Perform deep research on a topic"""
+    """Perform deep research on a topic with optional recency focus"""
     
     if learnings is None:
         learnings = []
     if visited_urls is None:
         visited_urls = []
     
-    print(f"Starting research with breadth={breadth}, depth={depth}")
+    print(f"Starting research with breadth={breadth}, depth={depth}, prioritize_recent={prioritize_recent}")
     
-    # Generate search queries
-    serp_queries = await generate_serp_queries(query, breadth, learnings)
+    # Generate search queries with recency focus
+    serp_queries = await generate_serp_queries(query, breadth, learnings, prioritize_recent)
     
     # Process all queries concurrently
     tasks = []
     for serp_query in serp_queries:
-        task = process_single_query(serp_query, breadth, depth, learnings, visited_urls)
+        task = process_single_query(serp_query, breadth, depth, learnings, visited_urls, prioritize_recent, days_back)
         tasks.append(task)
     
     results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -156,13 +168,20 @@ async def process_single_query(
     breadth: int,
     depth: int,
     learnings: List[str],
-    visited_urls: List[str]
+    visited_urls: List[str],
+    prioritize_recent: bool = True,
+    days_back: Optional[int] = None
 ) -> ResearchResult:
-    """Process a single search query"""
+    """Process a single search query with recency focus"""
     
     try:
-        # Perform search
-        search_result = await firecrawl.search(serp_query.query, limit=5)
+        # Perform search with date filtering
+        search_result = await firecrawl.search(
+            serp_query.query, 
+            limit=5,
+            prioritize_recent=prioritize_recent,
+            days_back=days_back
+        )
         
         # Extract URLs
         new_urls = []
@@ -198,7 +217,9 @@ async def process_single_query(
                 new_breadth,
                 new_depth,
                 current_learnings,
-                current_urls
+                current_urls,
+                prioritize_recent,
+                days_back
             )
         else:
             return ResearchResult(
