@@ -20,10 +20,6 @@ A Python implementation of the AI-powered deep research system that performs ite
 
 ## Quick Start
 
-**🚀 For the fastest setup, see our [QUICKSTART.md](QUICKSTART.md) guide!**
-
-## Installation
-
 1. Clone or download this directory
 2. Install dependencies:
 
@@ -76,7 +72,7 @@ This will verify that your API keys are properly configured and test the structu
 ### Command Line with Topic
 
 ```bash
-python main.py "artificial intelligence trends 2024"
+python main.py "artificial intelligence trends 2025"
 ```
 
 ### Interactive Mode
@@ -153,7 +149,7 @@ The system generates:
 ## Project Structure
 
 ```
-python-deep-research/
+deep-research-agent/
 ├── src/
 │   ├── __init__.py
 │   ├── ai_providers.py      # OpenAI and Gemini integration
@@ -172,7 +168,6 @@ python-deep-research/
 ├── LICENSE                 # MIT license
 ├── CHANGELOG.md            # Version history
 ├── CONTRIBUTING.md         # Contribution guidelines
-├── QUICKSTART.md           # Quick start guide
 └── README.md               # This file
 ```
 

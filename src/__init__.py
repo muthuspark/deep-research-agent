@@ -11,4 +11,4 @@ from dotenv import load_dotenv
 load_dotenv()
 
 __version__ = "1.0.0"
-__author__ = "Deep Research Team"
+__author__ = "Muthukrishnan"
