@@ -1,176 +1,286 @@
-# Deep Research Python
+# Deep Research Agent
 
-A Python implementation of the AI-powered deep research system that performs iterative research on any topic using search engines and large language models.
+A Python implementation of the AI-powered deep research system that performs iterative research on any topic using search engines and large language models, with advanced date filtering and recency prioritization.
 
-## Features
+## ✨ Features
 
-- **Iterative Research**: Performs deep research by recursively generating search queries and diving deeper based on findings
-- **Multiple AI Providers**: Supports both OpenAI and Google Gemini APIs
-- **Intelligent Query Generation**: Uses LLMs to generate targeted search queries based on research goals
-- **Depth & Breadth Control**: Configurable parameters to control research scope
-- **Smart Follow-up**: Generates follow-up questions for better research direction
-- **Comprehensive Reports**: Produces detailed markdown reports with findings and sources
-- **Concurrent Processing**: Handles multiple searches in parallel for efficiency
+- **🔍 Iterative Research**: Performs deep research by recursively generating search queries and diving deeper based on findings
+- **🕐 Date Filtering & Recency**: Prioritizes recent information with configurable date ranges (last days/weeks/months)
+- **🤖 Multiple AI Providers**: Supports OpenAI and Google Gemini APIs with automatic provider detection
+- **🎯 Smart Query Generation**: Uses LLMs to generate targeted search queries with date-aware terms
+- **📊 Depth & Breadth Control**: Configurable parameters to control research scope and iteration depth
+- **💡 Intelligent Follow-up**: Generates contextual follow-up questions for better research direction
+- **📝 Comprehensive Reports**: Produces detailed markdown reports with findings, sources, and timestamps
+- **⚡ Concurrent Processing**: Handles multiple searches in parallel for maximum efficiency
+- **🔧 Flexible Configuration**: Command-line arguments and interactive mode for different use cases
 
-## Requirements
+## 🚀 Quick Start
 
-- Python 3.8+
-- OpenAI API key OR Google Gemini API key
-- Firecrawl API key
-
-## Quick Start
-
-1. Clone or download this directory
-2. Install dependencies:
+### 1. Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/muthuspark/deep-research-agent.git
+cd deep-research-agent
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables by copying `env.example` to `.env`:
+### 2. Setup API Keys
+
+Copy the environment template and add your API keys:
 
 ```bash
 cp env.example .env
 ```
 
-4. Edit `.env` and add your API keys:
+Edit `.env` file with your API keys:
 
-**⚠️ IMPORTANT**: The `.env` file contains sensitive API keys. It's already included in `.gitignore` to prevent accidental commits to version control.
-
-For OpenAI:
-```
-FIRECRAWL_KEY=your_firecrawl_key_here
-OPENAI_KEY=your_openai_key_here
-```
-
-For Google Gemini:
-```
-FIRECRAWL_KEY=your_firecrawl_key_here
-GEMINI_KEY=your_gemini_key_here
-```
-
-Or both (the system will auto-detect and prefer Gemini if both are available):
-```
-FIRECRAWL_KEY=your_firecrawl_key_here
+```bash
+# Choose your AI provider
 OPENAI_KEY=your_openai_key_here
 GEMINI_KEY=your_gemini_key_here
-AI_PROVIDER=gemini  # Optional: explicitly choose provider
+
+# Required for web search
+FIRECRAWL_KEY=your_firecrawl_key_here
+
+# Optional: Date filtering defaults
+DEFAULT_PRIORITIZE_RECENT=true
+DEFAULT_DAYS_BACK=730  # 2 years
 ```
 
-## Usage
-
-### Testing Your Setup
-
-Before running research, you can test your AI provider configuration:
+### 3. Test Your Setup
 
 ```bash
 python test_providers.py
 ```
 
-This will verify that your API keys are properly configured and test the structured output generation.
-
-### Command Line with Topic
+### 4. Start Researching!
 
 ```bash
-python main.py "artificial intelligence trends 2025"
+# Quick start with recent data (default)
+python main.py "latest AI developments"
+
+# Custom date range (last 30 days)
+python main.py --days-back 30 "current market trends"
+
+# Interactive mode
+python main.py --interactive
 ```
 
-### Interactive Mode
+## 📖 Usage Guide
+
+### 🎯 Command Line Options
 
 ```bash
-python main.py
+# Basic usage with recent data prioritization (default)
+python main.py "your research topic"
+
+# Custom date filtering
+python main.py --days-back 30 "latest tech news"          # Last 30 days
+python main.py --days-back 7 "weekly market update"       # Last 7 days
+python main.py --days-back 365 "annual industry report"   # Last year
+
+# Disable recent prioritization for historical research
+python main.py --no-recent "history of artificial intelligence"
+
+# Advanced research parameters
+python main.py --breadth 6 --depth 3 --days-back 90 "comprehensive analysis"
+
+# Quick answers instead of full reports
+python main.py --type answer --days-back 7 "what happened this week"
 ```
 
-You'll be prompted to:
-1. Enter your research query
-2. Specify research breadth (recommended: 2-10, default: 4)
-3. Specify research depth (recommended: 1-5, default: 2)
-4. Choose report type (report/answer, default: report)
-5. Answer follow-up questions to refine research direction
+### 🔧 Available Arguments
 
-## How It Works
+| Argument | Description | Default |
+|----------|-------------|---------|
+| `--breadth N` | Number of parallel search queries (1-10) | 4 |
+| `--depth N` | Number of recursive research iterations (1-5) | 2 |
+| `--days-back N` | Only search information from last N days | 730 (2 years) |
+| `--recent` | Explicitly enable recent prioritization | ✅ Enabled |
+| `--no-recent` | Disable recent prioritization | ❌ Disabled |
+| `--type report\|answer` | Output type: detailed report or concise answer | report |
+| `--interactive` | Force interactive mode with prompts | ❌ Disabled |
 
-1. **Query Generation**: Takes user input and generates targeted search queries
-2. **Web Search**: Uses Firecrawl API to search and extract content from web pages
-3. **Content Analysis**: Processes search results to extract key learnings
-4. **Iterative Research**: Recursively explores deeper based on findings
-5. **Report Generation**: Compiles findings into comprehensive markdown reports
+### 📋 Common Use Cases
 
-## System Architecture
+#### 📰 Breaking News & Current Events
+```bash
+# Breaking news (last 24 hours)
+python main.py --days-back 1 "latest news on [topic]"
 
-![Deep Research System Flow](flow.png)
+# Weekly industry updates
+python main.py --days-back 7 "weekly tech industry news"
 
-### Key Components:
+# Monthly market analysis
+python main.py --days-back 30 "monthly market performance"
+```
 
-- **🤖 AI Provider**: Automatically detects and uses OpenAI or Gemini APIs
-- **🔍 Web Search**: Firecrawl API for comprehensive web content extraction
-- **🔄 Iterative Process**: Recursively explores deeper based on initial findings
-- **📊 Breadth Control**: Number of parallel search queries per iteration
-- **📉 Depth Control**: Number of recursive research iterations
-- **📚 Learning Extraction**: AI-powered content analysis and insight generation
+#### 🏢 Business & Finance
+```bash
+# Current market conditions
+python main.py --days-back 30 "current stock market analysis"
 
-## Configuration
+# Recent mergers and acquisitions
+python main.py --days-back 90 "latest business mergers 2024"
 
-### Environment Variables
+# Quarterly earnings reports
+python main.py --days-back 90 "Q4 2024 earnings reports"
+```
 
-- `FIRECRAWL_KEY`: Your Firecrawl API key (required)
-- `OPENAI_KEY`: Your OpenAI API key (optional, required if not using Gemini)
-- `GEMINI_KEY`: Your Google Gemini API key (optional, required if not using OpenAI)
-- `AI_PROVIDER`: Explicit AI provider choice ("openai" or "gemini", optional)
-- `FIRECRAWL_BASE_URL`: Firecrawl API base URL (optional, default: https://api.firecrawl.dev)
-- `CONCURRENCY_LIMIT`: Number of concurrent searches (optional, default: 2)
-- `OPENAI_ENDPOINT`: Custom OpenAI endpoint (optional)
-- `CUSTOM_MODEL`: Custom model name (optional)
+#### 💻 Technology Research
+```bash
+# Latest tech developments
+python main.py --days-back 60 "latest AI breakthroughs"
 
-### AI Provider Selection
+# Recent product launches
+python main.py --days-back 30 "new tech product releases"
 
-The system automatically detects which AI provider to use based on available API keys:
+# Current programming trends
+python main.py --days-back 90 "programming language trends 2024"
+```
 
-1. If `AI_PROVIDER` is set to "openai" or "gemini", it will use that provider (if available)
-2. If both keys are available and no explicit provider is set, it will prefer Gemini
-3. If only one key is available, it will use that provider
+#### 📚 Academic & Research
+```bash
+# Recent academic papers
+python main.py --days-back 180 "recent research papers on [topic]"
 
-### Supported Models
+# Current scientific developments
+python main.py --days-back 60 "latest scientific discoveries"
 
-- **OpenAI**: gpt-4o-mini (default), gpt-4o, gpt-3.5-turbo, and custom models
-- **Gemini**: gemini-1.5-flash (default), gemini-1.5-pro, and custom models
+# Historical analysis (all available data)
+python main.py --no-recent "comprehensive literature review"
+```
 
-### Research Parameters
+### 📖 For detailed usage examples and best practices, see: [USAGE_GUIDE.md](USAGE_GUIDE.md)
 
-- **Breadth**: Number of parallel search queries (2-10 recommended)
-- **Depth**: Number of recursive research iterations (1-5 recommended)
+## 🏗️ How It Works
 
-## Output
+1. **🔍 Smart Query Generation**: Creates date-aware search queries with recency terms
+2. **🌐 Web Search**: Uses Firecrawl API to extract and filter recent content
+3. **📊 Content Analysis**: AI-powered processing to extract key insights and learnings
+4. **🔄 Iterative Research**: Recursively explores deeper based on findings
+5. **📝 Report Generation**: Compiles findings into comprehensive markdown reports
 
-The system generates:
-- **report.md**: Detailed research report with findings and sources
-- **answer.md**: Concise answer (when using answer mode)
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 deep-research-agent/
 ├── src/
 │   ├── __init__.py
 │   ├── ai_providers.py      # OpenAI and Gemini integration
-│   ├── deep_research.py     # Core research logic
+│   ├── deep_research.py     # Core research logic with date filtering
 │   ├── feedback.py          # Follow-up question generation
-│   ├── firecrawl_client.py  # Web search client
-│   └── prompts.py           # AI prompts
-├── reports/                 # Generated research reports
-├── main.py                  # CLI interface
+│   ├── firecrawl_client.py  # Enhanced web search client
+│   └── prompts.py           # AI prompts and templates
+├── reports/                 # Generated research reports (auto-created)
+├── main.py                  # Enhanced CLI interface
 ├── test_providers.py        # AI provider test script
-├── requirements.txt         # Dependencies
-├── setup.py                 # Package setup script
-├── Makefile                 # Build and development commands
-├── env.example             # Environment template
-├── .gitignore              # Git ignore rules
-├── LICENSE                 # MIT license
-├── CHANGELOG.md            # Version history
+├── requirements.txt         # Python dependencies
+├── env.example             # Environment template with date config
+├── USAGE_GUIDE.md          # Comprehensive usage documentation
+├── CHANGELOG.md            # Version history and updates
 ├── CONTRIBUTING.md         # Contribution guidelines
 └── README.md               # This file
 ```
 
-## License
+## ⚙️ Configuration
+
+### Environment Variables
+
+```bash
+# AI Provider Configuration
+OPENAI_KEY=your_openai_key_here
+OPENAI_MODEL=gpt-4o-mini              # Optional: custom model
+GEMINI_KEY=your_gemini_key_here
+GEMINI_MODEL=gemini-1.5-flash         # Optional: custom model
+
+# Web Search Configuration
+FIRECRAWL_KEY=your_firecrawl_key_here
+FIRECRAWL_BASE_URL=https://api.firecrawl.dev
+
+# Performance Settings
+CONCURRENCY_LIMIT=2                   # Concurrent search requests
+
+# Date Filtering Configuration
+DEFAULT_PRIORITIZE_RECENT=true        # Enable recent data by default
+DEFAULT_DAYS_BACK=730                 # Default time window (2 years)
+```
+
+### AI Provider Selection
+
+The system automatically detects available AI providers:
+
+1. **Explicit Selection**: Set `AI_PROVIDER=openai` or `AI_PROVIDER=gemini`
+2. **Auto-detection**: Prefers Gemini if both keys are available
+3. **Fallback**: Uses whichever provider key is available
+
+### Supported Models
+
+- **OpenAI**: `gpt-4o-mini` (default), `gpt-4o`, `gpt-3.5-turbo`
+- **Gemini**: `gemini-1.5-flash` (default), `gemini-1.5-pro`
+
+## 📊 Output
+
+The system generates timestamped files in the `reports/` directory:
+
+- **Reports**: `report_YYYYMMDD_HHMMSS.md` - Detailed research reports
+- **Answers**: `answer_YYYYMMDD_HHMMSS.md` - Concise answers
+- **Sources**: All reports include comprehensive source lists
+
+## 🔧 Advanced Features
+
+### Date Filtering Intelligence
+- **Automatic Query Enhancement**: Adds "2024", "latest", "recent" terms
+- **Smart Result Scoring**: Prioritizes content with recent dates
+- **Flexible Time Windows**: From hours to years of historical data
+- **Content Freshness**: Sorts results by publication recency
+
+### Research Optimization
+- **Parallel Processing**: Concurrent searches for faster results
+- **Adaptive Depth**: Intelligent recursion based on content quality
+- **Source Validation**: Credibility assessment and deduplication
+- **Error Resilience**: Robust handling of API failures and timeouts
+
+## 🛠️ Troubleshooting
+
+### Getting Outdated Information?
+- Use `--days-back 30` for recent data
+- Add "2024" or "latest" to your query
+- Increase search breadth: `--breadth 6`
+
+### Too Few Results?
+- Increase time window: `--days-back 365`
+- Use `--no-recent` for historical research
+- Increase research depth: `--depth 3`
+
+### API Issues?
+- Run `python test_providers.py` to verify setup
+- Check your API key quotas and limits
+- Verify internet connectivity
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 📄 License
 
 MIT License - feel free to use and modify as needed.
+
+## 🆕 What's New
+
+- **✨ Date Filtering**: Prioritize recent information with configurable time windows
+- **🎯 Smart Queries**: Automatic addition of recency terms to search queries
+- **⚡ Enhanced Performance**: Improved result sorting and content freshness scoring
+- **🔧 Flexible CLI**: Comprehensive command-line options for different use cases
+- **📖 Usage Guide**: Detailed documentation with examples and best practices
+
+---
+
+**Ready to start researching?** 🚀
+
+```bash
+python main.py "latest developments in your field of interest"
+```
