@@ -25,11 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - Security-related changes will be listed here
 
-## [1.0.0] - 2024-01-15
+## [0.0.1] - 2025-07-07
 
 ### Added
 - **Core Research Agent**: Complete deep research system with AI-powered analysis
-- **Multi-Provider AI Support**: Integration with OpenAI, Anthropic, Groq, and Ollama
+- **Multi-Provider AI Support**: Integration with OpenAI, Anthropic
 - **Web Scraping Integration**: Firecrawl client for comprehensive web content extraction
 - **Feedback System**: User feedback collection and analysis capabilities
 - **Research Pipeline**: Multi-stage research process with source validation
